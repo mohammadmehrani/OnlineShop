@@ -1,0 +1,317 @@
+﻿
+@model SinglePage.Models.ViewModels.CategoryViewModel
+
+@{
+    ViewBag.Title = "Category";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+   
+  
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/Site.css" rel="stylesheet" />
+
+   
+    @*<script src="~/Scripts/jquery-3.3.1.min.js"></script>*@
+    <script src="~/Scripts/jquery-3.5.1.min.js"></script>
+
+    @*<script src="~/Scripts/Category.js"></script>*@
+    <title>Category</title>
+</head>
+<body>
+    <div class="container-fluid">
+
+        <h2>Category</h2>
+        <hr />
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="row form-groups" id="toolBar">
+                <div class="form-horizontal form-group col-sm-8">
+                    <div class="col-sm-2">
+                        <input class="btn btn-success" type="button" name="saveButton" id="btnSave" value="Save" />
+
+                    </div>
+                    <div class="col-sm-2">
+                        <input class="btn btn-warning" type="button" name="editButton" id="btnEdit" value="Edit" />
+                    </div>
+                    <div class="col-sm-2">
+                        <input class="btn btn-danger" type="button" name="deleteButton" id="btnDelete" value="Delete" />
+                    </div>
+                    <div class="col-sm-2">
+                        <input class="btn btn-info " type="button" name="refreshButton" id="btnRefresh2" value="Refresh" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-horizontal form-group col-sm-2">
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                <div class="form-group ">
+                    @Html.LabelFor(model => model.Code, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(model => model.Code, new { @id = "code", htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Code, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Title, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(model => model.Title, new { @id = "title", htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+            </div>
+        }
+
+
+        <br />
+        <br />
+
+        <table id="categoryGrid" class="table table-striped table-bordered" cellspacing="0" style="width:100%;margin:0 auto;">
+            <thead>
+                <tr style="text-align:center">
+
+
+                   
+                    <th>
+                        Code
+                    </th>
+                    <th>
+                        Title
+                    </th>
+                    <th></th>
+
+                </tr>
+            </thead>
+
+            <tbody>
+              
+                @foreach (var item in Model.GetCategory())
+                {
+                    <tr>
+                       
+                        @Html.HiddenFor(modelItem => item.CategoryId, new { @id = "categoryId" })
+                        
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Code)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Title)
+                        </td>
+                        <td>
+                            @*<input type="checkbox">*@
+                            <input type="checkbox" value="" name="checkbox1" id="checkbox1">
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("input[type='chekbox]").change(function () {
+                var $this = $(this);
+                if (this.checked) {
+                    $("input[type='chekbox]").attr("disabled", true);
+                    $this.removeAttr("disabled");
+                    $this.closest("tr").addClass("row-selected");
+                    var categoryId = $this.closest("tr").find("categoryId-cell").text().trim();
+                    var code = $this.closest("tr").find("code-cell").text().trim();
+                    var title = $this.closest("tr").find("title-cell").text().trim();
+                    inputs = {
+                        categoryId: categoryId,
+                        code: code,
+                        title: title
+                    };
+                 
+                    $("#title").val(inputs.title);
+                    $("#code").val(inputs.code);
+                    console.log(inputs);
+                }
+                if (!this.checked) {
+                    $("input[type='chekbox]").attr("disabled", false);
+                    $this.closest("tr").removeClass("row-selected");
+                    $("#title").val("");
+                    $("#code").val("");
+                    
+                }
+
+            })
+        })
+        
+    
+        //************** Save ********************
+        $("#btnSave").click(function () {
+
+            ref_CategoryViewModel = {
+               CategoryId: $('#categoryId').val(),
+                Code: $('#code').val(),
+
+                Title: $('#title').val(),
+            };
+            //alert("Code" + ref_CategoryViewModel.Code);
+            $.ajax({
+
+                url: "/Category/Create",
+
+                data: JSON.stringify(ref_CategoryViewModel),
+
+                type: "POST",
+
+                contentType: "application/json;charset=utf-8",
+
+                dataType: "json",
+
+                success: function (result) {
+                    alert("success");
+                    window.location.href = "Category";
+
+                },
+
+                error: function (errormessage) {
+
+                    alert(errormessage.responseText);
+
+                }
+
+            });
+        })
+        //***
+        //************** Edit ********************
+        $("#btnEdit").click(function () {
+
+            ref_CategoryViewModel = {
+                CategoryId: $('#categoryId').val(),
+                Code: $('#code').val(),
+
+                Title: $('#title').val(),
+            };
+            //alert("Code" + ref_CategoryViewModel.Code);
+            $.ajax({
+
+                url: "/Category/Edit",
+
+                data: JSON.stringify(ref_CategoryViewModel),
+
+                type: "POST",
+
+                contentType: "application/json;charset=utf-8",
+
+                dataType: "json",
+
+                success: function (result) {
+                    alert("edit was done");
+                    window.location.href = "Category";
+                    $("#title").val("");
+                    $("#code").val("");
+                },
+
+                error: function (errormessage) {
+
+                    alert(errormessage.responseText);
+
+                }
+
+            });
+        })
+
+        //***
+        //************** Delete ********************
+        $("#btnDelete").click(function () {
+           
+            Id = {
+                Id: $('#categoryId').val(),
+            };
+           
+           
+                alert($('#categoryId').val());
+                $.ajax({
+
+                    url: "/Category/Delete",
+
+                    data: JSON.stringify(Id),
+
+                    type: "POST",
+
+                    contentType: "application/json;charset=utf-8",
+
+                    dataType: "json",
+
+                    success: function (result) {
+                        alert("delete was done");
+                        window.location.href = "Category";
+
+                    },
+
+                    error: function (errormessage) {
+
+                        alert(errormessage.responseText);
+
+                    }
+
+                });
+            
+        })
+
+        //***
+        //************** Refresh ********************
+        $("#btnRefresh2").click(function () {
+
+            location.reload();
+        })
+            //***
+            //************** OnRowSelect ******************
+            //$("table tr").click(function () {
+            //    alert(this.rowIndex);
+
+            //});
+
+            //OnRowSelect = function (e) {
+                //var grid = $("#CategoryGrid").data("kendoGrid");
+                //var selectedRow = this.dataItem(this.select());
+                ////alert(selectedRow.Id);
+                ////alert(selectedRow.Id);
+                //var categoryModel = {};
+                //$("#code").val(selectedRow.Code);
+                //$("#name").val(selectedRow.Name);
+                //categoryModel.Id = selectedRow.Id;
+                //===================================
+
+                ////Reference the Table.
+                //var grid = document.getElementById("categoryGrid");
+                ////Reference the CheckBoxes in Table.
+                //var selectedCheckBox = grid.getElementsByTagName("INPUT").rowNumber;
+                ////Fill up textboxes with record fields values
+                //var selectedRow = selectedCheckBox.parentNode.parentNode;
+                //var id = selectedRow.cells[1].innerHTML;
+                //$("#code").val(selectedRow.cells[2].innerHTML);
+                //$("#title").val(selectedRow.cells[2].innerHTML);
+            //var table = document.getElementById("categoryGrid"), rIndex;
+            //    for (var i = 0; i < table.rows.length; i++) {
+            //        table.rows[i].onclick = function () {
+            //            rIndex = this.rowIndex;
+            //            console.log("Index of table :" + rIndex)
+            //           var id = this.cells[0].innerHTML;
+            //            $("#code").val(this.cells[1].innerHTML);
+            //            $("#title").val(this.cells[2].innerHTML);
+            //        }
+            //    }
+
+
+                                //***
+    </script>
+
+</body>
+</html>
+

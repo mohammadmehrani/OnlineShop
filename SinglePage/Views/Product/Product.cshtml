@@ -1,0 +1,408 @@
+﻿
+@model SinglePage.Models.ViewModels.ProductViewModel
+
+@{
+    ViewBag.Title = "Product";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    
+
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/Site.css" rel="stylesheet" />
+
+
+    <script src="~/Scripts/jquery-3.3.1.min.js"></script>
+
+
+
+    @*<script src="~/Scripts/Category.js"></script>*@
+    <title>Product</title>
+</head>
+<body>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        
+
+        <div class="row form-groups" id="toolBar">
+            <div class="form-horizontal form-group col-sm-8">
+                <div class="col-sm-2">
+                    <input class="btn btn-success" type="button" name="saveButton" id="btnSave1" value="Save" />
+
+                </div>
+                <div class="col-sm-2">
+                    <input class="btn btn-warning" type="button" name="editButton" id="btnEdit1" value="Edit" />
+                </div>
+                <div class="col-sm-2">
+                    <input class="btn btn-danger" type="button" name="deleteButton" id="btnDelete1" value="Delete" />
+                </div>
+                <div class="col-sm-2">
+                    <input class="btn btn-info " type="button" name="refreshButton" id="btnRefresh1" value="Refresh" />
+                </div>
+            </div>
+        </div>
+
+        <div class="form-horizontal form-group col-sm-6">
+            <hr />
+
+            <div class="form-group ">
+                @Html.LabelFor(model => model.ProductCode, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(model => model.ProductCode, new { @id = "productCode", htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.ProductCode, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.ProductName, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(model => model.ProductName, new { @id = "productName", htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.ProductName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.Amount, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(model => model.Amount, new { @id = "amount", htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Amount, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.UnitPrice, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(model => model.UnitPrice, new { @id = "unitPrice", htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.UnitPrice, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.CategoryId, "Category", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownList("CategoryId", null,"select category", htmlAttributes: new { @class = "form-control" })
+
+                    @Html.ValidationMessageFor(model => model.CategoryId, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+
+        </div>
+    }
+
+
+    <br />
+    <br />
+
+    <table id="productGrid" class="table table-striped table-bordered" cellspacing="0" style="width:100%;margin:0 auto;">
+        <thead>
+            <tr style="text-align:center">
+
+                @*<th>
+                        <input type="checkbox" disabled="disabled">
+                    </th>*@
+               
+                <th>
+                    ProductCode
+                </th>
+                <th>
+                    ProductName
+                </th>
+                <th>
+                    Amount
+                </th>
+                <th>
+                    UnitPrice
+                </th>
+                <th>
+                    Price
+                </th>
+                
+                <th></th>
+
+            </tr>
+        </thead>
+
+        <tbody>
+           
+            @foreach (var item in Model.GetProduct())
+            {
+                <tr>
+                   
+                    @Html.HiddenFor(modelItem => item.ProductId, new { @id = "ProductId" })
+
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ProductCode)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ProductName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Amount)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.UnitPrice)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Price)
+                    </td>
+                   
+
+
+                    
+
+                </tr>
+            }
+        </tbody>
+    </table>
+
+
+
+    <script type="text/javascript">
+        //$(document).ready(function () {
+        //    $("input[type='chekbox]").change(function () {
+        //        var $this = $(this);
+        //        if (this.checked) {
+        //            $("input[type='chekbox]").attr("disabled", true);
+        //            $this.removeAttr("disabled");
+        //            $this.closest("tr").addClass("row-selected");
+        //            var id = $this.closest("tr").find("ProductId-cell").text().trim();
+        //            console.log("id" + id);
+        //            var productCode = $this.closest("tr").find("productCode-cell").text().trim();
+        //            var productName = $this.closest("tr").find("productName-cell").text().trim();
+        //            var amount = $this.closest("tr").find("amount-cell").text().trim();
+        //            var unitPrice = $this.closest("tr").find("unitPrice-cell").text().trim();
+        //            var CategoryId = $this.closest("tr").find("CategoryId-cell").text().trim();
+
+        //            inputs = {
+        //                id: ProductId,
+        //                productCode: productCode,
+        //                productName: productName,
+        //                amount: amount,
+        //                unitPrice: unitPrice,
+        //                CategoryId: CategoryId
+        //            };
+        //            $("#ProductId").val(inputs.id);
+        //            $("#productCode").val(inputs.productCode);
+        //            $("#productName").val(inputs.productName);
+        //            $("#amount").val(inputs.amount);
+        //            $("#unitPrice").val(inputs.unitPrice);
+        //            $("#CategoryId").val(inputs.CategoryId);
+
+        //            console.log(inputs);
+        //        }
+        //        if (!this.checked) {
+        //            $("input[type='chekbox]").attr("disabled", false);
+        //            $this.closest("tr").removeClass("row-selected");
+        //            $("#productCode").val("");
+        //            $("#productName").val("");
+        //            $("#amount").val("");
+        //            $("#unitPrice").val("");
+        //            $("#CategoryId").val("");
+        //            $("#ProductId").val("");
+        //        }
+
+        //    })
+        //})
+
+         var table = document.getElementById("productGrid"), rIndex;
+        for (var i = 0; i < table.rows.length; i++) {
+            table.rows[i].onclick = function () {
+                rIndex = this.rowIndex;
+                console.log("Index of table :" + rIndex)
+                var id = this.cells[0].innerHTML.trim();
+                console.log("id is:" + id)
+               // $("#code").val(this.cells[1].innerHTML.trim());
+               // $("#title").val(this.cells[2].innerHTML.trim());
+               //// console.log("id is:" + $("#title").val(this.cells[2].innerHTML))
+               // $("#unitPrice").val(this.cells[3].innerHTML.trim());
+               // $("#countity").val(this.cells[4].innerHTML.trim());
+               $("#productCode").val(this.cells[1].innerHTML.trim());
+                $("#productName").val(this.cells[2].innerHTML.trim());
+                   $("#amount").val(this.cells[3].innerHTML.trim());
+                 $("#unitPrice").val(this.cells[4].innerHTML.trim());
+                   $("#CategoryId").val(this.cells[5].innerHTML.trim());
+            }
+          
+        }
+        //************** Save ********************
+        $("#btnSave1").click(function () {
+
+            ref_ProductViewModel = {
+               ProductId:$('#ProductId').val(),
+                ProductCode: $('#productCode').val(),
+                ProductName: $('#productName').val(),
+                Amount: $('#amount').val(),
+                unitPrice: $('#unitPrice').val(),
+                CategoryId: $('#CategoryId').val(),
+
+            };
+            //alert("Code" + ref_CategoryViewModel.Code);
+            $.ajax({
+
+                url: "/Product/Create",
+
+                data: JSON.stringify(ref_ProductViewModel),
+
+                type: "POST",
+
+                contentType: "application/json;charset=utf-8",
+
+                dataType: "json",
+
+                success: function (result) {
+                    alert("success");
+                    window.location.href = "Product";
+
+                },
+
+                error: function (errormessage) {
+
+                    alert(errormessage.responseText);
+
+                }
+
+            });
+        })
+        //***
+        //************** Edit ********************
+        $("#btnEdit1").click(function () {
+
+            ref_ProductViewModel = {
+                ProductId:table.rows[rIndex].cells[0].innerHTML,
+                ProductCode: $('#productCode').val(),
+                ProductName: $('#productName').val(),
+                Amount: $('#amount').val(),
+                unitPrice: $('#unitPrice').val(),
+                CategoryId: $('#CategoryId').val(),
+            };
+            //alert("Code" + ref_CategoryViewModel.Code);
+            $.ajax({
+
+                url: "/Product/Edit",
+
+                data: JSON.stringify(ref_ProductViewModel),
+
+                type: "POST",
+
+                contentType: "application/json;charset=utf-8",
+
+                dataType: "json",
+
+                success: function (result) {
+                    alert("edit was done");
+                    window.location.href = "Product";
+                    
+                },
+
+                error: function (errormessage) {
+
+                    alert(errormessage.responseText);
+
+                }
+
+            });
+        })
+
+        //***
+        //************** Delete ********************
+
+
+        $("#btnDelete1").click(function () {
+
+
+            Id = {
+                Id: $('#ProductId').val(),
+
+            };
+
+            {
+                $.ajax({
+
+                    url: "/Product/Delete",
+
+                    data: JSON.stringify(Id),
+
+                    type: "POST",
+
+                    contentType: "application/json;charset=utf-8",
+
+                    dataType: "json",
+
+                    success: function (result) {
+                        alert("delete was done");
+                        window.location.href = "Product";
+
+                    },
+
+                    error: function (errormessage) {
+
+                        alert(errormessage.responseText);
+
+                    }
+
+                });
+            }
+        })
+
+        //***
+        //************** Refresh ********************
+        $("#btnRefresh1").click(function () {
+
+            location.reload();
+        })
+            //***
+            //************** OnRowSelect ******************
+            //$("table tr").click(function () {
+            //    alert(this.rowIndex);
+
+            //});
+
+            //OnRowSelect = function (e) {
+                //var grid = $("#CategoryGrid").data("kendoGrid");
+                //var selectedRow = this.dataItem(this.select());
+                ////alert(selectedRow.Id);
+                ////alert(selectedRow.Id);
+                //var categoryModel = {};
+                //$("#code").val(selectedRow.Code);
+                //$("#name").val(selectedRow.Name);
+                //categoryModel.Id = selectedRow.Id;
+                //===================================
+
+                ////Reference the Table.
+                //var grid = document.getElementById("categoryGrid");
+                ////Reference the CheckBoxes in Table.
+                //var selectedCheckBox = grid.getElementsByTagName("INPUT").rowNumber;
+                ////Fill up textboxes with record fields values
+                //var selectedRow = selectedCheckBox.parentNode.parentNode;
+                //var id = selectedRow.cells[1].innerHTML;
+                //$("#code").val(selectedRow.cells[2].innerHTML);
+                //$("#title").val(selectedRow.cells[2].innerHTML);
+            //var table = document.getElementById("productGrid"), rIndex;
+            //    for (var i = 0; i < table.rows.length; i++) {
+            //        table.rows[i].onclick = function () {
+            //            rIndex = this.rowIndex;
+            //            console.log("Index of table :" + rIndex)
+            //           var id = this.cells[0].innerHTML;
+            //            $("#productCode").val(this.cells[1].innerHTML);
+            //            $("#productName").val(this.cells[2].innerHTML);
+            //            $("#amount").val(this.cells[3].innerHTML);
+            //            $("#price").val(this.cells[4].innerHTML);
+            //            $("#CategoryId").val(this.cells[5].innerHTML);
+
+            //        }
+            //    }
+
+
+                                //***
+    </script>
+
+</body>
+</html>
+
+
